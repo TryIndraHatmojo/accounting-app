@@ -13,7 +13,7 @@ class CompanySeeder extends Seeder
     public function run(): void
     {
         foreach ([
-            ['name' => 'PT Perusahaan Utama', 'slug' => 'perusahaan-utama'],
+            ['name' => 'CV. UNIVERSAL VINDO COCO', 'slug' => 'perusahaan-utama'],
             ['name' => 'PT Perusahaan Kedua', 'slug' => 'perusahaan-kedua'],
         ] as $company) {
             Company::query()->updateOrCreate(
