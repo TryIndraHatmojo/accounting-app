@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\Filament\Resources\Expenses\Pages\CreateExpense;
 use App\Filament\Resources\Expenses\Pages\ListExpenses;
+use App\Models\Company;
 use App\Models\Expense;
 use App\Models\ExpenseType;
 use App\Models\User;
+use Database\Seeders\CompanySeeder;
 use Database\Seeders\ExpenseTypeSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -26,20 +28,34 @@ class ExpenseManagementTest extends TestCase
 
     public function test_expense_type_seeder_creates_default_types_idempotently(): void
     {
+        $this->seed(CompanySeeder::class);
         $this->seed(ExpenseTypeSeeder::class);
         $this->seed(ExpenseTypeSeeder::class);
 
-        $this->assertSame(2, ExpenseType::query()->count());
-        $this->assertDatabaseHas(ExpenseType::class, ['name' => 'Gaji Karyawan']);
-        $this->assertDatabaseHas(ExpenseType::class, ['name' => 'Pengeluaran Perusahaan Lainnya']);
+        $this->assertSame(4, ExpenseType::query()->count());
+
+        Company::query()->each(function (Company $company): void {
+            $this->assertDatabaseHas(ExpenseType::class, [
+                'company_id' => $company->id,
+                'name' => 'Gaji Karyawan',
+            ]);
+            $this->assertDatabaseHas(ExpenseType::class, [
+                'company_id' => $company->id,
+                'name' => 'Pengeluaran Perusahaan Lainnya',
+            ]);
+        });
     }
 
     public function test_user_can_create_an_expense_from_filament(): void
     {
-        $user = User::factory()->create();
-        $expenseType = ExpenseType::factory()->create(['name' => 'Gaji Karyawan']);
+        [$company, $user] = $this->createTenantUser();
+        $expenseType = ExpenseType::factory()->create([
+            'company_id' => $company->id,
+            'name' => 'Gaji Karyawan',
+        ]);
 
         $this->actingAs($user);
+        $this->setTenant($company);
 
         Livewire::test(CreateExpense::class)
             ->fillForm([
@@ -54,6 +70,7 @@ class ExpenseManagementTest extends TestCase
 
         $expense = Expense::query()->where('description', 'Gaji Budi periode Juli 2026')->firstOrFail();
 
+        $this->assertTrue($expense->company->is($company));
         $this->assertTrue($expense->expenseType->is($expenseType));
         $this->assertTrue($expense->recorder->is($user));
         $this->assertSame('7500000.00', $expense->amount);
@@ -61,7 +78,10 @@ class ExpenseManagementTest extends TestCase
 
     public function test_user_can_create_an_expense_type_inline_from_expense_form(): void
     {
-        $this->actingAs(User::factory()->create());
+        [$company, $user] = $this->createTenantUser();
+
+        $this->actingAs($user);
+        $this->setTenant($company);
 
         Livewire::test(CreateExpense::class)
             ->assertFormComponentActionExists('expense_type_id', 'createOption')
@@ -75,14 +95,15 @@ class ExpenseManagementTest extends TestCase
 
     public function test_user_can_view_expenses_in_the_report_table(): void
     {
-        $user = User::factory()->create();
-        $expenseType = ExpenseType::factory()->create();
+        [$company, $user] = $this->createTenantUser();
+        $expenseType = ExpenseType::factory()->create(['company_id' => $company->id]);
         $expenses = Expense::factory()
             ->count(2)
             ->recycle([$user, $expenseType])
-            ->create();
+            ->create(['company_id' => $company->id]);
 
         $this->actingAs($user);
+        $this->setTenant($company);
 
         Livewire::test(ListExpenses::class)
             ->assertCanSeeTableRecords($expenses);
@@ -90,16 +111,37 @@ class ExpenseManagementTest extends TestCase
 
     public function test_expense_form_rejects_an_invalid_amount(): void
     {
-        $this->actingAs(User::factory()->create());
+        [$company, $user] = $this->createTenantUser();
+
+        $this->actingAs($user);
+        $this->setTenant($company);
 
         Livewire::test(CreateExpense::class)
             ->fillForm([
                 'expense_date' => '2026-07-01',
-                'expense_type_id' => ExpenseType::factory()->create()->id,
+                'expense_type_id' => ExpenseType::factory()->create(['company_id' => $company->id])->id,
                 'description' => 'Nominal tidak valid',
                 'amount' => 0,
             ])
             ->call('create')
             ->assertHasFormErrors(['amount' => 'min']);
+    }
+
+    /**
+     * @return array{Company, User}
+     */
+    private function createTenantUser(): array
+    {
+        $company = Company::factory()->create();
+        $user = User::factory()->create();
+        $user->companies()->attach($company);
+
+        return [$company, $user];
+    }
+
+    private function setTenant(Company $company): void
+    {
+        Filament::setTenant($company);
+        Filament::bootCurrentPanel();
     }
 }

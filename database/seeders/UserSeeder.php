@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -35,7 +36,7 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($accounts as $account) {
-            User::query()->updateOrCreate(
+            $user = User::query()->updateOrCreate(
                 ['email' => $account['email']],
                 [
                     'role_id' => Role::query()->where('name', $account['role'])->valueOrFail('id'),
@@ -44,6 +45,8 @@ class UserSeeder extends Seeder
                     'password' => 'password',
                 ],
             );
+
+            $user->companies()->syncWithoutDetaching(Company::query()->pluck('id'));
         }
     }
 }

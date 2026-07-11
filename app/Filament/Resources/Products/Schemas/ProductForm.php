@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Filament\Resources\ExpenseTypes\Schemas;
+namespace App\Filament\Resources\Products\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
-class ExpenseTypeForm
+class ProductForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Nama jenis pengeluaran')
+                    ->label('Nama produk')
                     ->required()
                     ->maxLength(255)
                     ->scopedUnique(ignoreRecord: true),

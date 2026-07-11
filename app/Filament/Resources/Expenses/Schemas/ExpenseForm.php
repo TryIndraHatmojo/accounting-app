@@ -29,7 +29,7 @@ class ExpenseForm
                             ->label('Nama jenis pengeluaran')
                             ->required()
                             ->maxLength(255)
-                            ->unique(),
+                            ->scopedUnique(),
                     ])
                     ->createOptionModalHeading('Tambah Jenis Pengeluaran')
                     ->required(),

@@ -3,13 +3,13 @@
 namespace Database\Factories;
 
 use App\Models\Company;
-use App\Models\ExpenseType;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<ExpenseType>
+ * @extends Factory<Product>
  */
-class ExpenseTypeFactory extends Factory
+class ProductFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -20,7 +20,7 @@ class ExpenseTypeFactory extends Factory
     {
         return [
             'company_id' => Company::factory(),
-            'name' => fake()->unique()->words(2, true),
+            'name' => fake()->unique()->word(),
         ];
     }
 }

@@ -17,6 +17,8 @@ use UnitEnum;
 
 class RoleResource extends Resource
 {
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $model = Role::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

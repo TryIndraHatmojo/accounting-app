@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Company;
 use App\Models\Expense;
 use App\Models\ExpenseType;
 use App\Models\User;
@@ -20,6 +21,7 @@ class ExpenseFactory extends Factory
     public function definition(): array
     {
         return [
+            'company_id' => Company::factory(),
             'expense_date' => fake()->dateTimeBetween('-1 year'),
             'expense_type_id' => ExpenseType::factory(),
             'recorded_by' => User::factory(),

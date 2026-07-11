@@ -8,11 +8,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['expense_date', 'expense_type_id', 'recorded_by', 'description', 'amount'])]
+#[Fillable(['company_id', 'expense_date', 'expense_type_id', 'recorded_by', 'description', 'amount'])]
 class Expense extends Model
 {
     /** @use HasFactory<ExpenseFactory> */
     use HasFactory;
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function expenseType(): BelongsTo
     {

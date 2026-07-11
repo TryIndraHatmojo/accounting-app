@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Filament\Resources\Roles\Pages\CreateRole;
 use App\Filament\Resources\Users\Pages\CreateUser;
+use App\Models\Company;
 use App\Models\Role;
 use App\Models\User;
 use Filament\Facades\Filament;
@@ -49,12 +50,19 @@ class UserRoleManagementTest extends TestCase
             $this->assertSame($roleName, $user->role->name);
             $this->assertNotNull($user->email_verified_at);
             $this->assertTrue(password_verify('password', $user->password));
+            $this->assertCount(2, $user->companies);
         }
     }
 
     public function test_admin_can_create_a_role_from_filament(): void
     {
-        $this->actingAs(User::factory()->create());
+        $company = Company::factory()->create();
+        $user = User::factory()->create();
+        $user->companies()->attach($company);
+
+        $this->actingAs($user);
+        Filament::setTenant($company);
+        Filament::bootCurrentPanel();
 
         Livewire::test(CreateRole::class)
             ->fillForm(['name' => 'Manajer Ekspor'])
@@ -67,10 +75,14 @@ class UserRoleManagementTest extends TestCase
 
     public function test_admin_can_create_a_user_with_a_role_from_filament(): void
     {
+        $company = Company::factory()->create();
         $admin = User::factory()->create();
+        $admin->companies()->attach($company);
         $role = Role::factory()->create(['name' => 'Supervisor Gudang']);
 
         $this->actingAs($admin);
+        Filament::setTenant($company);
+        Filament::bootCurrentPanel();
 
         Livewire::test(CreateUser::class)
             ->fillForm([
@@ -86,6 +98,7 @@ class UserRoleManagementTest extends TestCase
         $user = User::query()->where('email', 'budi@accounting.test')->firstOrFail();
 
         $this->assertTrue($user->role->is($role));
+        $this->assertTrue($user->companies->contains($company));
         $this->assertTrue(password_verify('rahasia123', $user->password));
     }
 }
