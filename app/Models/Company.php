@@ -61,6 +61,11 @@ class Company extends Model implements HasCurrentTenantLabel
         return $this->hasMany(GoodsReceipt::class);
     }
 
+    public function exportDeclarations(): HasMany
+    {
+        return $this->hasMany(ExportDeclaration::class);
+    }
+
     public function getCurrentTenantLabel(): string
     {
         return 'Perusahaan aktif';
