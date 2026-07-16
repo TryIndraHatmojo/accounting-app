@@ -93,6 +93,41 @@ class ExpenseManagementTest extends TestCase
         $this->assertDatabaseHas(ExpenseType::class, ['name' => 'Biaya Dokumen Ekspor']);
     }
 
+    public function test_user_can_create_a_batch_expense_with_calculated_technical_cost(): void
+    {
+        [$company, $user] = $this->createTenantUser();
+        $expenseType = ExpenseType::factory()->create(['company_id' => $company->id]);
+
+        $this->actingAs($user);
+        $this->setTenant($company);
+
+        Livewire::test(CreateExpense::class)
+            ->fillForm([
+                'expense_date' => '2025-11-27',
+                'expense_type_id' => $expenseType->id,
+                'batch_number' => '5.2',
+                'batch_type' => 'export',
+                'description' => 'Bongkar 4x20ft SINDO',
+                'item_code' => 'MT-271125',
+                'quantity' => 593,
+                'unit_price' => '1.602',
+                'cost_category' => 'technical',
+                'amount' => 1,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors()
+            ->assertNotified();
+
+        $expense = Expense::query()->where('item_code', 'MT-271125')->firstOrFail();
+
+        $this->assertSame('5.2', $expense->batch_number);
+        $this->assertSame('export', $expense->batch_type);
+        $this->assertSame('technical', $expense->cost_category);
+        $this->assertSame('593.000', $expense->quantity);
+        $this->assertSame('1602.00', $expense->unit_price);
+        $this->assertSame('949986.00', $expense->amount);
+    }
+
     public function test_user_can_view_expenses_in_the_report_table(): void
     {
         [$company, $user] = $this->createTenantUser();
@@ -106,7 +141,9 @@ class ExpenseManagementTest extends TestCase
         $this->setTenant($company);
 
         Livewire::test(ListExpenses::class)
-            ->assertCanSeeTableRecords($expenses);
+            ->assertCanSeeTableRecords($expenses)
+            ->assertTableColumnExists('operational_cost')
+            ->assertTableColumnExists('technical_cost');
     }
 
     public function test_expense_form_rejects_an_invalid_amount(): void
@@ -125,6 +162,26 @@ class ExpenseManagementTest extends TestCase
             ])
             ->call('create')
             ->assertHasFormErrors(['amount' => 'min']);
+    }
+
+    public function test_expense_form_requires_complete_batch_cost_details(): void
+    {
+        [$company, $user] = $this->createTenantUser();
+
+        $this->actingAs($user);
+        $this->setTenant($company);
+
+        Livewire::test(CreateExpense::class)
+            ->fillForm([
+                'expense_date' => '2025-11-27',
+                'expense_type_id' => ExpenseType::factory()->create(['company_id' => $company->id])->id,
+                'description' => 'Packing Mente',
+                'quantity' => 150,
+                'cost_category' => 'technical',
+                'amount' => 900000,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['unit_price' => 'required_with']);
     }
 
     /**
