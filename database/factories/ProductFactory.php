@@ -21,6 +21,7 @@ class ProductFactory extends Factory
         return [
             'company_id' => Company::factory(),
             'name' => fake()->unique()->word(),
+            'abbreviation' => fake()->unique()->lexify('????'),
         ];
     }
 }

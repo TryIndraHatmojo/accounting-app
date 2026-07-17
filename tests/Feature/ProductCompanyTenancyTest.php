@@ -41,6 +41,7 @@ class ProductCompanyTenancyTest extends TestCase
             $this->assertDatabaseHas(Product::class, [
                 'company_id' => $company->id,
                 'name' => 'Bunga Pala',
+                'abbreviation' => 'BPA',
             ]);
         });
     }
@@ -103,7 +104,10 @@ class ProductCompanyTenancyTest extends TestCase
         $this->setTenant($company);
 
         Livewire::test(CreateProduct::class)
-            ->fillForm(['name' => 'Vanili'])
+            ->fillForm([
+                'name' => 'Vanili',
+                'abbreviation' => 'vnl',
+            ])
             ->call('create')
             ->assertHasNoFormErrors()
             ->assertNotified();
@@ -111,6 +115,7 @@ class ProductCompanyTenancyTest extends TestCase
         $this->assertDatabaseHas(Product::class, [
             'company_id' => $company->id,
             'name' => 'Vanili',
+            'abbreviation' => 'VNL',
         ]);
     }
 

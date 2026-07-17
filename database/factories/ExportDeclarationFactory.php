@@ -26,7 +26,7 @@ class ExportDeclarationFactory extends Factory
             'peb_number' => fake()->unique()->bothify('##.???.##-##'),
             'invoice_number' => fake()->unique()->bothify('###/???/???-INV/##/##'),
             'container_quantity' => fake()->numberBetween(1, 10),
-            'container_size' => fake()->randomElement(['20ft', '40ft', '40HC']),
+            'container_size' => fake()->randomElement(['20 ft', '40 ft', '40 ft HC']),
             'destination_port' => fake()->country(),
             'attachments' => null,
             'notes' => fake()->optional()->sentence(),

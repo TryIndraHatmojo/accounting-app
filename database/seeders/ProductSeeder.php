@@ -16,24 +16,26 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        $productNames = [
-            'Kopra',
-            'Cengkeh',
-            'Kutulak',
-            'Damar Batu',
-            'Biji Pala',
-            'Biji Gebang',
-            'Gagang Cengkeh',
-            'Kunyit',
-            'Mente',
-            'Bunga Pala',
+        $products = [
+            'Kopra' => 'KPR',
+            'Cengkeh' => 'CKG',
+            'Kutulak' => 'LAC',
+            'Damar Batu' => 'DBT',
+            'Biji Pala' => 'BPL',
+            'Biji Gebang' => 'GBG',
+            'Gagang Cengkeh' => 'GCK',
+            'Kunyit' => 'KYT',
+            'Mente' => 'MNT',
+            'Bunga Pala' => 'BPA',
         ];
 
-        Company::query()->each(function (Company $company) use ($productNames): void {
-            foreach ($productNames as $productName) {
+        Company::query()->each(function (Company $company) use ($products): void {
+            foreach ($products as $productName => $abbreviation) {
                 Product::query()->firstOrCreate([
                     'company_id' => $company->id,
                     'name' => $productName,
+                ], [
+                    'abbreviation' => $abbreviation,
                 ]);
             }
         });

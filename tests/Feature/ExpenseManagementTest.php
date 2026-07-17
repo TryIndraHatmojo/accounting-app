@@ -32,7 +32,7 @@ class ExpenseManagementTest extends TestCase
         $this->seed(ExpenseTypeSeeder::class);
         $this->seed(ExpenseTypeSeeder::class);
 
-        $this->assertSame(4, ExpenseType::query()->count());
+        $this->assertSame(16, ExpenseType::query()->count());
 
         Company::query()->each(function (Company $company): void {
             $this->assertDatabaseHas(ExpenseType::class, [
@@ -42,6 +42,10 @@ class ExpenseManagementTest extends TestCase
             $this->assertDatabaseHas(ExpenseType::class, [
                 'company_id' => $company->id,
                 'name' => 'Pengeluaran Perusahaan Lainnya',
+            ]);
+            $this->assertDatabaseHas(ExpenseType::class, [
+                'company_id' => $company->id,
+                'name' => 'Administrasi Ekspor',
             ]);
         });
     }

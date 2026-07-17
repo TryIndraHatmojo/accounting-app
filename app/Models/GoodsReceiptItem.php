@@ -24,6 +24,15 @@ class GoodsReceiptItem extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function stockCode(): string
+    {
+        if (blank($this->product->abbreviation) || $this->goodsReceipt->received_date === null) {
+            return '-';
+        }
+
+        return $this->product->abbreviation.'-'.$this->goodsReceipt->received_date->format('dmy');
+    }
+
     protected static function booted(): void
     {
         static::saving(function (GoodsReceiptItem $item): void {

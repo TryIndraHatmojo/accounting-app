@@ -23,7 +23,7 @@ class ExportDeclarationItemFactory extends Factory
             'container_number' => fake()->bothify('???? ###### #'),
             'seal_number' => fake()->numerify('#######'),
             'warehouse' => fake()->bothify('???#####'),
-            'container_size' => fake()->randomElement(['20ft', '40ft', '40HC']),
+            'container_size' => fake()->randomElement(['20 ft', '40 ft', '40 ft HC']),
             'description' => fake()->words(2, true),
             'gross_weight' => fake()->randomFloat(3, 1000, 30000),
             'net_weight' => fake()->randomFloat(3, 1000, 30000),

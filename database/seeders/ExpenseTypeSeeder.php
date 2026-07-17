@@ -16,8 +16,19 @@ class ExpenseTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        Company::query()->each(function (Company $company): void {
-            foreach (['Gaji Karyawan', 'Pengeluaran Perusahaan Lainnya'] as $expenseTypeName) {
+        $expenseTypeNames = [
+            'Gaji Karyawan',
+            'Bongkar Muat',
+            'Transportasi',
+            'Biaya Kontainer',
+            'Administrasi Ekspor',
+            'Perlengkapan Gudang',
+            'Listrik dan Utilitas',
+            'Pengeluaran Perusahaan Lainnya',
+        ];
+
+        Company::query()->each(function (Company $company) use ($expenseTypeNames): void {
+            foreach ($expenseTypeNames as $expenseTypeName) {
                 ExpenseType::query()->firstOrCreate([
                     'company_id' => $company->id,
                     'name' => $expenseTypeName,

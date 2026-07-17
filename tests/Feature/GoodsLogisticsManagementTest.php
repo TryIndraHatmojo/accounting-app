@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Pages\GoodsStock;
 use App\Filament\Resources\GoodsReceipts\Pages\CreateGoodsReceipt;
 use App\Filament\Resources\GoodsReceipts\Pages\ListGoodsReceipts;
 use App\Filament\Resources\GoodsReceipts\Pages\ViewGoodsReceipt;
@@ -10,6 +11,7 @@ use App\Filament\Resources\ShipmentNotices\Pages\ListShipmentNotices;
 use App\Filament\Resources\ShipmentNotices\Pages\ViewShipmentNotice;
 use App\Models\Company;
 use App\Models\GoodsReceipt;
+use App\Models\GoodsReceiptItem;
 use App\Models\Product;
 use App\Models\ShipmentNotice;
 use App\Models\Supplier;
@@ -164,6 +166,63 @@ class GoodsLogisticsManagementTest extends TestCase
         Livewire::test(ListGoodsReceipts::class)
             ->assertCanSeeTableRecords([$visibleReceipt])
             ->assertCanNotSeeTableRecords([$hiddenReceipt]);
+    }
+
+    public function test_goods_stock_uses_product_abbreviation_and_received_date_per_company(): void
+    {
+        [$company, $user] = $this->createTenantUser();
+        $otherCompany = Company::factory()->create();
+        $product = Product::factory()->create([
+            'company_id' => $company->id,
+            'name' => 'Kutulak',
+            'abbreviation' => 'lac',
+        ]);
+        $otherProduct = Product::factory()->create([
+            'company_id' => $otherCompany->id,
+            'name' => 'Biji Gebang',
+            'abbreviation' => 'gbg',
+        ]);
+        $supplier = Supplier::factory()->create(['company_id' => $company->id]);
+        $otherSupplier = Supplier::factory()->create(['company_id' => $otherCompany->id]);
+        $goodsReceipt = GoodsReceipt::factory()->create([
+            'company_id' => $company->id,
+            'shipment_notice_id' => null,
+            'supplier_id' => $supplier->id,
+            'report_date' => '2026-06-29',
+            'received_date' => '2026-06-30',
+            'recorded_by' => $user->id,
+        ]);
+        $otherGoodsReceipt = GoodsReceipt::factory()->create([
+            'company_id' => $otherCompany->id,
+            'shipment_notice_id' => null,
+            'supplier_id' => $otherSupplier->id,
+            'received_date' => '2026-04-06',
+        ]);
+        $visibleItem = GoodsReceiptItem::factory()->create([
+            'goods_receipt_id' => $goodsReceipt->id,
+            'product_id' => $product->id,
+            'package_count' => 64,
+            'initial_weight' => 4800,
+            'final_weight' => 4736,
+        ]);
+        $hiddenItem = GoodsReceiptItem::factory()->create([
+            'goods_receipt_id' => $otherGoodsReceipt->id,
+            'product_id' => $otherProduct->id,
+            'package_count' => 3,
+            'initial_weight' => 200,
+            'final_weight' => 185,
+        ]);
+
+        $this->actingAs($user);
+        $this->setTenant($company);
+
+        Livewire::test(GoodsStock::class)
+            ->assertOk()
+            ->assertCanSeeTableRecords([$visibleItem])
+            ->assertCanNotSeeTableRecords([$hiddenItem])
+            ->assertTableColumnStateSet('stock_code', 'LAC-300626', $visibleItem)
+            ->assertTableColumnStateSet('package_count', 64, $visibleItem)
+            ->assertTableColumnStateSet('final_weight', '4736.000', $visibleItem);
     }
 
     /**

@@ -18,6 +18,11 @@ class ProductsTable
                     ->label('Nama produk')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('abbreviation')
+                    ->label('Nama Produk Disingkat')
+                    ->badge()
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y H:i')

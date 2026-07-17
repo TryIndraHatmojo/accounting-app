@@ -78,6 +78,13 @@ class ShipmentNoticeForm
                                             ->required()
                                             ->maxLength(255)
                                             ->scopedUnique(),
+                                        TextInput::make('abbreviation')
+                                            ->label('Nama Produk Disingkat')
+                                            ->helperText('Contoh: KYT untuk Kunyit.')
+                                            ->required()
+                                            ->maxLength(20)
+                                            ->rules(['regex:/^[A-Za-z0-9]+$/'])
+                                            ->scopedUnique(),
                                     ])
                                     ->createOptionModalHeading('Tambah Produk')
                                     ->required()
