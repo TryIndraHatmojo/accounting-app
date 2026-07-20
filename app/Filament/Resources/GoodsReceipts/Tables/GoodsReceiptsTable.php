@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\GoodsReceipts\Tables;
 
+use App\Filament\Resources\ShipmentNotices\ShipmentNoticeResource;
+use App\Models\GoodsReceipt;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -28,6 +30,10 @@ class GoodsReceiptsTable
                 TextColumn::make('shipmentNotice.document_number')
                     ->label('Referensi PPB')
                     ->searchable()
+                    ->color('primary')
+                    ->url(fn (GoodsReceipt $record): ?string => $record->shipment_notice_id
+                        ? ShipmentNoticeResource::getUrl('view', ['record' => $record->shipment_notice_id])
+                        : null)
                     ->placeholder('-'),
                 TextColumn::make('supplier.name')
                     ->label('Supplier')

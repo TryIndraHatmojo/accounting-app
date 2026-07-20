@@ -9,6 +9,7 @@ use App\Filament\Resources\GoodsReceipts\Pages\ViewGoodsReceipt;
 use App\Filament\Resources\ShipmentNotices\Pages\CreateShipmentNotice;
 use App\Filament\Resources\ShipmentNotices\Pages\ListShipmentNotices;
 use App\Filament\Resources\ShipmentNotices\Pages\ViewShipmentNotice;
+use App\Filament\Resources\ShipmentNotices\ShipmentNoticeResource;
 use App\Models\Company;
 use App\Models\ExportDeclaration;
 use App\Models\ExportDeclarationItem;
@@ -20,6 +21,8 @@ use App\Models\ShipmentNotice;
 use App\Models\Supplier;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -147,6 +150,38 @@ class GoodsLogisticsManagementTest extends TestCase
 
         Livewire::test(ViewGoodsReceipt::class, ['record' => $goodsReceipt->id])
             ->assertOk();
+    }
+
+    public function test_goods_receipt_ppb_reference_links_to_the_shipment_notice_view(): void
+    {
+        [$company, $user] = $this->createTenantUser();
+        $shipmentNotice = ShipmentNotice::factory()->create(['company_id' => $company->id]);
+        $goodsReceipt = GoodsReceipt::factory()->create([
+            'company_id' => $company->id,
+            'shipment_notice_id' => $shipmentNotice->id,
+            'origin_reference' => $shipmentNotice->document_number,
+        ]);
+
+        $this->actingAs($user);
+        $this->setTenant($company);
+
+        $shipmentNoticeViewUrl = ShipmentNoticeResource::getUrl('view', [
+            'record' => $shipmentNotice,
+        ]);
+
+        Livewire::test(ListGoodsReceipts::class)
+            ->assertTableColumnExists(
+                'shipmentNotice.document_number',
+                fn (TextColumn $column): bool => $column->getUrl() === $shipmentNoticeViewUrl,
+                $goodsReceipt,
+            );
+
+        Livewire::test(ViewGoodsReceipt::class, ['record' => $goodsReceipt->id])
+            ->assertSchemaComponentExists(
+                'shipmentNotice.document_number',
+                'infolist',
+                fn (TextEntry $entry): bool => $entry->getUrl() === $shipmentNoticeViewUrl,
+            );
     }
 
     public function test_logistics_documents_are_isolated_by_company(): void

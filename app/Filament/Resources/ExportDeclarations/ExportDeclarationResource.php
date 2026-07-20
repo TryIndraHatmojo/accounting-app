@@ -21,7 +21,9 @@ class ExportDeclarationResource extends Resource
 {
     protected static ?string $model = ExportDeclaration::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentText;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentArrowUp;
+
+    protected static string|BackedEnum|null $activeNavigationIcon = Heroicon::DocumentArrowUp;
 
     protected static string|UnitEnum|null $navigationGroup = 'Logistik';
 

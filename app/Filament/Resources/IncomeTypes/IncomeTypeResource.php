@@ -19,7 +19,9 @@ class IncomeTypeResource extends Resource
 {
     protected static ?string $model = IncomeType::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::ArrowTrendingUp;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedListBullet;
+
+    protected static string|BackedEnum|null $activeNavigationIcon = Heroicon::ListBullet;
 
     protected static string|UnitEnum|null $navigationGroup = 'Data Master';
 

@@ -35,6 +35,8 @@ class GoodsStock extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArchiveBox;
 
+    protected static string|BackedEnum|null $activeNavigationIcon = Heroicon::ArchiveBox;
+
     protected static string|UnitEnum|null $navigationGroup = 'Logistik';
 
     protected static ?string $navigationLabel = 'Stock Barang';

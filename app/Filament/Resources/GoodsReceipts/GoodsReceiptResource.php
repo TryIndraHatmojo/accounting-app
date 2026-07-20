@@ -21,7 +21,9 @@ class GoodsReceiptResource extends Resource
 {
     protected static ?string $model = GoodsReceipt::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::ClipboardDocumentCheck;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInboxArrowDown;
+
+    protected static string|BackedEnum|null $activeNavigationIcon = Heroicon::InboxArrowDown;
 
     protected static string|UnitEnum|null $navigationGroup = 'Logistik';
 

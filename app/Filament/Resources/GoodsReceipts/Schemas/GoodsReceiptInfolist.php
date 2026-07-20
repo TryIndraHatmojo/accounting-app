@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\GoodsReceipts\Schemas;
 
+use App\Filament\Resources\ShipmentNotices\ShipmentNoticeResource;
+use App\Models\GoodsReceipt;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
@@ -17,7 +19,13 @@ class GoodsReceiptInfolist
                     ->schema([
                         TextEntry::make('document_number')->label('No. LPB')->badge(),
                         TextEntry::make('report_date')->label('Tanggal Pembuatan')->date('d/m/Y'),
-                        TextEntry::make('shipmentNotice.document_number')->label('Referensi PPB')->placeholder('-'),
+                        TextEntry::make('shipmentNotice.document_number')
+                            ->label('Referensi PPB')
+                            ->color('primary')
+                            ->url(fn (GoodsReceipt $record): ?string => $record->shipment_notice_id
+                                ? ShipmentNoticeResource::getUrl('view', ['record' => $record->shipment_notice_id])
+                                : null)
+                            ->placeholder('-'),
                         TextEntry::make('supplier.name')->label('Supplier')->badge(),
                         TextEntry::make('origin_reference')->label('Asal Barang / No. PPB')->placeholder('-'),
                         TextEntry::make('origin')->label('Asal')->placeholder('-'),

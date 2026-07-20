@@ -21,7 +21,9 @@ class ShipmentNoticeResource extends Resource
 {
     protected static ?string $model = ShipmentNotice::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::Truck;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
+
+    protected static string|BackedEnum|null $activeNavigationIcon = Heroicon::Truck;
 
     protected static string|UnitEnum|null $navigationGroup = 'Logistik';
 
