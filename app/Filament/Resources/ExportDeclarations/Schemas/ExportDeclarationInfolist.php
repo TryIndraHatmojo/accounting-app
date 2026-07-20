@@ -36,6 +36,7 @@ class ExportDeclarationInfolist
                                 TextEntry::make('seal_number')->label('Nomor Seal'),
                                 TextEntry::make('warehouse')->label('Gudang')->placeholder('-'),
                                 TextEntry::make('container_size')->label('Ukuran'),
+                                TextEntry::make('product.name')->label('Nama Barang')->placeholder('-'),
                                 TextEntry::make('description')->label('Deskripsi Barang'),
                                 TextEntry::make('gross_weight')->label('Berat Bruto')->formatStateUsing(self::formatWeight(...)),
                                 TextEntry::make('net_weight')->label('Berat Netto')->formatStateUsing(self::formatWeight(...)),

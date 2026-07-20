@@ -16,7 +16,7 @@ class ShipmentNoticeSeeder extends Seeder
     public function run(): void
     {
         $recorderId = User::query()
-            ->where('email', 'gudang@accounting.test')
+            ->where('email', 'gudang@example.com')
             ->valueOrFail('id');
 
         Company::query()->each(function (Company $company) use ($recorderId): void {

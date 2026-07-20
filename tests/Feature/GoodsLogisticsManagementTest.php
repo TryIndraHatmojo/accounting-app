@@ -10,8 +10,11 @@ use App\Filament\Resources\ShipmentNotices\Pages\CreateShipmentNotice;
 use App\Filament\Resources\ShipmentNotices\Pages\ListShipmentNotices;
 use App\Filament\Resources\ShipmentNotices\Pages\ViewShipmentNotice;
 use App\Models\Company;
+use App\Models\ExportDeclaration;
+use App\Models\ExportDeclarationItem;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
+use App\Models\GoodsStockMovement;
 use App\Models\Product;
 use App\Models\ShipmentNotice;
 use App\Models\Supplier;
@@ -212,17 +215,39 @@ class GoodsLogisticsManagementTest extends TestCase
             'initial_weight' => 200,
             'final_weight' => 185,
         ]);
+        $exportDeclaration = ExportDeclaration::factory()->create([
+            'company_id' => $company->id,
+            'document_date' => '2026-07-10',
+            'peb_number' => '43.UVC.07-26',
+            'recorded_by' => $user->id,
+        ]);
+        $exportItem = ExportDeclarationItem::factory()->create([
+            'export_declaration_id' => $exportDeclaration->id,
+            'product_id' => $product->id,
+            'description' => 'Kutulak',
+            'bag_count' => 10,
+            'net_weight' => 680,
+        ]);
+        $outgoingMovement = (new GoodsStockMovement)->forceFill([
+            'id' => -$exportItem->id,
+        ]);
 
         $this->actingAs($user);
         $this->setTenant($company);
 
         Livewire::test(GoodsStock::class)
             ->assertOk()
-            ->assertCanSeeTableRecords([$visibleItem])
+            ->assertCanSeeTableRecords([$visibleItem, $outgoingMovement])
             ->assertCanNotSeeTableRecords([$hiddenItem])
             ->assertTableColumnStateSet('stock_code', 'LAC-300626', $visibleItem)
-            ->assertTableColumnStateSet('package_count', 64, $visibleItem)
-            ->assertTableColumnStateSet('final_weight', '4736.000', $visibleItem);
+            ->assertTableColumnStateSet('package_change', 64, $visibleItem)
+            ->assertTableColumnStateSet('weight_change', '4736.000', $visibleItem)
+            ->assertTableColumnStateSet('movement_type', GoodsStockMovement::TYPE_OUTGOING, $outgoingMovement)
+            ->assertTableColumnStateSet('reference_number', '43.UVC.07-26', $outgoingMovement)
+            ->assertTableColumnStateSet('package_change', -10, $outgoingMovement)
+            ->assertTableColumnStateSet('weight_change', '-680.000', $outgoingMovement)
+            ->assertTableColumnSummarySet('package_change', 'stock', 54)
+            ->assertTableColumnSummarySet('weight_change', 'stock', 4056);
     }
 
     /**

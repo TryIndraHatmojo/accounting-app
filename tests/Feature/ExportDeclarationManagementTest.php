@@ -7,6 +7,7 @@ use App\Filament\Resources\ExportDeclarations\Pages\ListExportDeclarations;
 use App\Filament\Resources\ExportDeclarations\Pages\ViewExportDeclaration;
 use App\Models\Company;
 use App\Models\ExportDeclaration;
+use App\Models\Product;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -30,6 +31,10 @@ class ExportDeclarationManagementTest extends TestCase
     {
         Storage::fake('public');
         [$company, $user] = $this->createTenantUser();
+        $product = Product::factory()->create([
+            'company_id' => $company->id,
+            'name' => 'Sticklac',
+        ]);
 
         $this->actingAs($user);
         $this->setTenant($company);
@@ -44,6 +49,7 @@ class ExportDeclarationManagementTest extends TestCase
                 'container_size' => '20 ft',
                 'destination_port' => 'India',
                 'items' => [[
+                    'product_id' => $product->id,
                     'container_number' => 'SIKU 307838 5',
                     'seal_number' => '0087588',
                     'warehouse' => 'UVC00059',
@@ -67,6 +73,7 @@ class ExportDeclarationManagementTest extends TestCase
 
         $this->assertTrue($exportDeclaration->company->is($company));
         $this->assertTrue($exportDeclaration->recorder->is($user));
+        $this->assertTrue($item->product->is($product));
         $this->assertSame('14740.000', $item->gross_weight);
         $this->assertSame('14690.000', $item->net_weight);
         $this->assertCount(2, $exportDeclaration->attachments);

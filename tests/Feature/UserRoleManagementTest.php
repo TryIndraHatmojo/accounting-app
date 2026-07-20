@@ -39,9 +39,9 @@ class UserRoleManagementTest extends TestCase
         }
 
         $accounts = [
-            'admin@accounting.test' => 'Admin',
-            'gudang@accounting.test' => 'Gudang',
-            'akuntan@accounting.test' => 'Akuntan',
+            'admin@example.com' => 'Admin',
+            'gudang@example.com' => 'Gudang',
+            'akuntan@example.com' => 'Akuntan',
         ];
 
         foreach ($accounts as $email => $roleName) {
@@ -87,7 +87,7 @@ class UserRoleManagementTest extends TestCase
         Livewire::test(CreateUser::class)
             ->fillForm([
                 'name' => 'Budi Santoso',
-                'email' => 'budi@accounting.test',
+                'email' => 'budi@example.com',
                 'role_id' => $role->id,
                 'password' => 'rahasia123',
             ])
@@ -95,7 +95,7 @@ class UserRoleManagementTest extends TestCase
             ->assertHasNoFormErrors()
             ->assertNotified();
 
-        $user = User::query()->where('email', 'budi@accounting.test')->firstOrFail();
+        $user = User::query()->where('email', 'budi@example.com')->firstOrFail();
 
         $this->assertTrue($user->role->is($role));
         $this->assertTrue($user->companies->contains($company));

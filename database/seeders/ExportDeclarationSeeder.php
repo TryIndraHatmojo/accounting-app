@@ -15,7 +15,7 @@ class ExportDeclarationSeeder extends Seeder
     public function run(): void
     {
         $recorderId = User::query()
-            ->where('email', 'akuntan@accounting.test')
+            ->where('email', 'akuntan@example.com')
             ->valueOrFail('id');
 
         Company::query()->each(function (Company $company) use ($recorderId): void {
@@ -41,6 +41,9 @@ class ExportDeclarationSeeder extends Seeder
                 $exportDeclaration->items()->updateOrCreate(
                     ['sort_order' => 0],
                     [
+                        'product_id' => $company->products()
+                            ->where('name', $exportData['description'])
+                            ->valueOrFail('id'),
                         'container_number' => $exportData['container_number'],
                         'seal_number' => $exportData['seal_number'],
                         'warehouse' => $exportData['warehouse'],

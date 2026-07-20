@@ -32,6 +32,11 @@ class Product extends Model
         return $this->hasMany(GoodsReceiptItem::class);
     }
 
+    public function exportDeclarationItems(): HasMany
+    {
+        return $this->hasMany(ExportDeclarationItem::class);
+    }
+
     protected function abbreviation(): Attribute
     {
         return Attribute::make(

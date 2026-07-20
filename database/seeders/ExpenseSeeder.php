@@ -16,7 +16,7 @@ class ExpenseSeeder extends Seeder
     public function run(): void
     {
         $recorderId = User::query()
-            ->where('email', 'akuntan@accounting.test')
+            ->where('email', 'akuntan@example.com')
             ->valueOrFail('id');
 
         Company::query()->each(function (Company $company) use ($recorderId): void {

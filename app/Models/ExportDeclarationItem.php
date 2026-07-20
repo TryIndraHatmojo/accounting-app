@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['export_declaration_id', 'container_number', 'seal_number', 'warehouse', 'container_size', 'description', 'gross_weight', 'net_weight', 'bag_count', 'sort_order'])]
+#[Fillable(['export_declaration_id', 'product_id', 'container_number', 'seal_number', 'warehouse', 'container_size', 'description', 'gross_weight', 'net_weight', 'bag_count', 'sort_order'])]
 class ExportDeclarationItem extends Model
 {
     /** @use HasFactory<ExportDeclarationItemFactory> */
@@ -17,6 +17,11 @@ class ExportDeclarationItem extends Model
     public function exportDeclaration(): BelongsTo
     {
         return $this->belongsTo(ExportDeclaration::class);
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
     }
 
     /**

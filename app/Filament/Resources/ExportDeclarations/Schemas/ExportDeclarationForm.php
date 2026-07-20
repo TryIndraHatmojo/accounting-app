@@ -54,15 +54,15 @@ class ExportDeclarationForm
                         Select::make('container_size')
                             ->label('Ukuran Kontainer')
                             ->options([
-                                '20 ft' => "20 ft",
-                                '20 ft Refer' => "20 ft Reefer",
-                                '20 ft HC' => "20 ft HC",
-                                '40 ft' => "40 ft",
-                                '40 ft Refer' => "40 ft Reefer",
-                                '40 ft HC' => "40 ft HC",
-                                '45 ft' => "45 ft",
-                                '48 ft' => "48 ft",
-                                '53 ft' => "53 ft",
+                                '20 ft' => '20 ft',
+                                '20 ft Refer' => '20 ft Reefer',
+                                '20 ft HC' => '20 ft HC',
+                                '40 ft' => '40 ft',
+                                '40 ft Refer' => '40 ft Reefer',
+                                '40 ft HC' => '40 ft HC',
+                                '45 ft' => '45 ft',
+                                '48 ft' => '48 ft',
+                                '53 ft' => '53 ft',
                             ])
                             ->default('20 ft')
                             ->required()
@@ -102,19 +102,41 @@ class ExportDeclarationForm
                                 Select::make('container_size')
                                     ->label('Ukuran')
                                     ->options([
-                                        '20 ft' => "20 ft",
-                                        '20 ft Refer' => "20 ft Reefer",
-                                        '20 ft HC' => "20 ft HC",
-                                        '40 ft' => "40 ft",
-                                        '40 ft Refer' => "40 ft Reefer",
-                                        '40 ft HC' => "40 ft HC",
-                                        '45 ft' => "45 ft",
-                                        '48 ft' => "48 ft",
-                                        '53 ft' => "53 ft",
+                                        '20 ft' => '20 ft',
+                                        '20 ft Refer' => '20 ft Reefer',
+                                        '20 ft HC' => '20 ft HC',
+                                        '40 ft' => '40 ft',
+                                        '40 ft Refer' => '40 ft Reefer',
+                                        '40 ft HC' => '40 ft HC',
+                                        '45 ft' => '45 ft',
+                                        '48 ft' => '48 ft',
+                                        '53 ft' => '53 ft',
                                     ])
                                     ->default('20 ft')
                                     ->required()
                                     ->native(false),
+                                Select::make('product_id')
+                                    ->label('Nama Barang')
+                                    ->relationship('product', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->createOptionForm([
+                                        TextInput::make('name')
+                                            ->label('Nama produk')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->scopedUnique(),
+                                        TextInput::make('abbreviation')
+                                            ->label('Nama Produk Disingkat')
+                                            ->helperText('Contoh: LAC untuk Kutulak.')
+                                            ->required()
+                                            ->maxLength(20)
+                                            ->rules(['regex:/^[A-Za-z0-9]+$/'])
+                                            ->scopedUnique(),
+                                    ])
+                                    ->createOptionModalHeading('Tambah Produk')
+                                    ->required()
+                                    ->columnSpan(2),
                                 TextInput::make('description')
                                     ->label('Deskripsi Barang')
                                     ->placeholder('Contoh: Sticklac')
